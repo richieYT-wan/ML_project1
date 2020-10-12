@@ -33,7 +33,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     loss = 0
     
     for i in range(max_iters):
-        for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
+        for y_batch, tx_batch in batch_iter(y, tx, batch_size=1, num_batches=1):
             gradient = compute_stoch_gradient(y_batch, tx_batch, w)
             w = w - gamma* gradient
         
