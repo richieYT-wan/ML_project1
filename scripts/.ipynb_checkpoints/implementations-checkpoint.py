@@ -25,14 +25,14 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     return w, loss
 
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
-    """Linear regression using Stochastic Gradient Descent
+    """Linear regression using Stochastic Gradient Descent.
     Using a minibatch size of 1, random and shuffled minibatches 
     are generated using the batch_iter function 
-    located in the Utility functions below."""
-    
+    """
+    #Initializing values + sanity check to make sure target (y) labels are binary 
     w = initial_w
     loss = 0
-    
+    y = preprocessing.convert_label(y)
     for i in range(max_iters):
         for y_batch, tx_batch in batch_iter(y, tx, batch_size=1, num_batches=1):
             gradient = compute_stoch_gradient(y_batch, tx_batch, w)
@@ -44,10 +44,10 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 
 
 def least_squares(y, tx):
-    """Least squares regression using normal equations    
-    With X.T(y-X*w)=0,
-    X.T * y = (X.T * X)*w
-    a*w = b"""
+    """Least squares regression using normal equations.
+    With X.T(y-X*w)=0, and X.T * y = (X.T * X)*w,
+    i.e. : a*w = b
+    """
     
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
@@ -83,15 +83,22 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     Labels must be binary, i.e. y : {0;1}
     """
     w = initial_w
-    
+    losses=[]
     for i in range(max_iters):
         w = w - gamma*compute_log_gradient(y, tx, w)
-    loss = compute_log_oss(y, tx, w)
-    return w, loss
+        loss = compute_logloss(y,tx,w)
+        losses.append(loss)    
+    return w, losses[-1], losses
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """Regularized logistic regression using gradient descent or SGD"""
+    w = initial_w
+    
+    for i in range(max_iters):
+        gradient = compute_log_gradient(y, tx, w) + 2*lambda_* w
+        w = w - gamma*gradient
+    loss = compute_logloss(y, tx, w) + 0.5*lambda_*np.squeeze(w.T.dot(w))
     return w, loss
 
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Implements the functions used to compute the loss and gradient of various methods.
-Also contains functions used for gradient steps such as sigmoid, calculate_hessian,
-for logistic regression.
+    Implements the functions used to compute the loss and gradient of various
+    methods. Also contains functions used for gradient steps such as sigmoid,
+    calculate_hessian for logistic regression.
 """
 
 import numpy as np
@@ -32,7 +32,9 @@ def compute_log_gradient(y, tx, w):
     """Computes the gradient for logistic regression
     """
     sig = sigmoid(tx.dot(w))
-    return tx.T.dot(sig-y)
+    #reshaping, we had broadcasting issues.
+    grad = tx.T.dot(sig-(y.reshape(sig.shape)))
+    return grad
 
 #=========================================================================#
 #========                     Cost functions                      ========#
@@ -60,16 +62,26 @@ def compute_rmse(y, tx, w):
     
     return np.sqrt(2*compute_mse(y,tx,w))
 
-def sigmoid(z):
+def sigmoid(t):
     """Computes the sigmoid function on input z. 
-       z may be of the form tx.dot(w)
-    """
-    return 1/(1 + np.exp(-z))
+       z may be of the form tx.dot(w). Numerically stable
+       For entries that are negative, the form exp(z)/(1+exp(z)) is used,
+       whereas for positive entries, the form 1/(1+exp(-z)) is used.
+       """
+    #Copy to avoid unwanted inplace modifications
+    z = t.copy()
+    #Fancy np indexing
+    z[z>0] = np.divide(1, 1+np.exp(-(z[z>0])) )
+    z[z<=0] = np.divide(np.exp(z[z<=0]), 1+np.exp(z[z<=0]))
+    return z
 
 def compute_logloss(y, tx, w):
     """Computes the loss function for logistic regression.
-       Using the maxium likelihood criterion
+       Using the negative log likelihood criterion
     """
     sig = sigmoid(tx.dot(w))
-    loss = -1 * (y.T.dot(np.log(sig)) + (1-y).T.dot(np.log(1-sig)))
-    return np.squeeze(loss)
+    #Add a infinitesimally small value to avoid log(0)
+    loss = -1*( y.T.dot(np.log(sig+1e-8))+(1-y).T.dot(np.log(1-sig+1e-8)))
+    
+    #dividing by N, can be changed later, doesnt really change anything.
+    return np.squeeze(loss)/len(y)
