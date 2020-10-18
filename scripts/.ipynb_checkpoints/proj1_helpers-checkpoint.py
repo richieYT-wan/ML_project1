@@ -2,7 +2,7 @@
 """some helper functions for project 1."""
 import csv
 import numpy as np
-
+from costs import sigmoid
 
 def load_csv_data(data_path, sub_sample=False):
     """Loads data and returns y (class labels), tX (features) and ids (event ids)"""
@@ -32,6 +32,18 @@ def predict_labels(weights, data):
     
     return y_pred
 
+def predict_labels_log(weights, data):
+    """Implements the quantize step in logistic regression.
+    Generates class predictions given weights obtained from logistic regression
+    , and a test data matrix. Prediction is based on the probability of y = 1 
+    given x (data) and w (weights) with p(y=1|x)= sigmoid(x.T.dot(w))
+    being more/less than 0.5."""
+    y_pred = sigmoid(data.dot(weights))
+    #fancy indexing
+    y_pred[y_pred >0.5] = 1
+    y_pred[y_pred <=0.5] = -1
+    
+    return y_pred
 
 def create_csv_submission(ids, y_pred, name):
     """
@@ -46,3 +58,4 @@ def create_csv_submission(ids, y_pred, name):
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({'Id':int(r1),'Prediction':int(r2)})
+
