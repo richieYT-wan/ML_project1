@@ -97,12 +97,14 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     """Regularized logistic regression using gradient descent or SGD"""
     w = initial_w
-    
+    losses = []
     for i in range(max_iters):
+        loss = compute_logloss(y, tx, w) + 0.5*lambda_*np.squeeze(w.T.dot(w))
         gradient = compute_log_gradient(y, tx, w) + 2*lambda_* w
         w = w - gamma*gradient
-    loss = compute_logloss(y, tx, w) + 0.5*lambda_*np.squeeze(w.T.dot(w))
-    return w, loss
+        losses.append(loss)
+    
+    return w, losses[-1], losses
 
 
 
