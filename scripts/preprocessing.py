@@ -103,8 +103,10 @@ def convert_label(y):
 
 def replace_999_nan(tx):
     """Replaces all -999 values by NaN, allows easier processing below"""
-    tx[tx==-999]= np.nan
-    return tx
+    #copy to prevent unwanted inplace value assignment
+    tx_out = tx.copy()
+    tx_out[tx_out==-999]= np.nan
+    return tx_out
 
 
 def replace_999_mean(tx):
@@ -112,11 +114,11 @@ def replace_999_mean(tx):
        First replaces all abherrant values by NaN, then compute the *mean*,
        ignoring those values, then replacing NaNs by the computed *mean*.
     """
-    tx = replace_999_nan(tx) #replace -999 by NaN
-    mean_of_feat = np.nanmean(tx,axis = 0) #mean of columns 
-    inds = np.where(np.isnan(tx)) #calculate index
-    tx[inds] = np.take(mean_of_feat, inds[1]) #replace NaN by mean
-    return tx
+    tx_out = replace_999_nan(tx) #replace -999 by NaN
+    mean_of_feat = np.nanmean(tx_out,axis = 0) #mean of columns 
+    inds = np.where(np.isnan(tx_out)) #calculate index
+    tx_out[inds] = np.take(mean_of_feat, inds[1]) #replace NaN by mean
+    return tx_out
 
 
 def replace_999_mean(tx):
@@ -124,11 +126,11 @@ def replace_999_mean(tx):
        First replaces all abherrant values by NaN, then compute the *median*,
        ignoring those values, then replacing NaNs by the computed *median*.
     """
-    tx = replace_999_nan(tx) #replace -999 by NaN
-    mean_of_feat = np.nanmedian(tx,axis = 0) #median of columns 
-    inds = np.where(np.isnan(tx)) #calculate index
-    tx[inds] = np.take(mean_of_feat, inds[1]) #replace NaN by median
-    return tx
+    tx_out = replace_999_nan(tx) #replace -999 by NaN
+    med_of_feat = np.nanmedian(tx_out,axis = 0) #median of columns 
+    inds = np.where(np.isnan(tx_out)) #calculate index
+    tx_out[inds] = np.take(med_of_feat, inds[1]) #replace NaN by median
+    return tx_out
 
 
 def replace_outliers(tx, conf_level = 1):
@@ -152,4 +154,3 @@ def replace_outliers(tx, conf_level = 1):
         tx_train_without_out = np.where( (tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i]) , med_of_feat[i], tx) #replace values if it isn't in Confidence intervalle
         
     return tx_train_without_out 
-
