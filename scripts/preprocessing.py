@@ -100,9 +100,6 @@ def convert_label(y):
     #using fancy numpy indexing
     bin_y[bin_y==-1]=0
     return bin_y
-<<<<<<< Updated upstream
-=======
-
 
 def replace_999_nan(tx):
     """Replaces all -999 values by NaN, allows easier processing below"""
@@ -156,4 +153,3 @@ def replace_outliers(tx, conf_level = 1):
         
     return tx_train_without_out 
 
->>>>>>> Stashed changes
