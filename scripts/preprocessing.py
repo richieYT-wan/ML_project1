@@ -137,7 +137,7 @@ def replace_outliers(tx, conf_level = 1):
                conf_level (int), takes values : 0 (68%), 1 (95%), 2 (99.7%)
        Output : tx (np.array), without outliers
     """
-    if conf_level ~in [0,1,2]:
+    if conf_level in ~[0,1,2]:
         conf_level = 1;
     #Computing mean, standard deviation, median of all features column-wise
     mean_of_feat = np.nanmean( tx, axis = 0)
