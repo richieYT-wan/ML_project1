@@ -154,3 +154,42 @@ def replace_outliers(tx, conf_level = 1):
         tx_train_without_out = np.where( (tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i]) , med_of_feat[i], tx) #replace values if it isn't in Confidence intervalle
         
     return tx_train_without_out 
+
+def prijetnum_indexing(tx, jetcol=22):
+    """
+    Gets the indices for the various clusters according to their PRI_jet_num.
+    """
+    pjn_arr = tx[:,jetcol]
+    return (pjn_arr==0),(pjn_arr==1),(pjn_arr==2),(pjn_arr==3)
+
+def prijetnum_clustering(tx,y=None,jetcol=22):
+    """
+    Clusters the data into four groups, according to their PRI_jet_num value.
+    PRI_jet_num is found in column 22, can change if needed.
+    Input : tx, y (training set and target), or only tx (test_set)
+    Output : split dataset (clusters). 
+    Additional ouput : Clusterized targets if it is a training set, i.e.
+                       (Y is not None)
+                       Indices if it is a test set (Y is None)
+    """
+    #Values of PRI_jet_num are found in column 22 of tx.
+    id0,id1,id2,id3 = prijetnum_indexing(tx,jetcol)
+    #getting indices, clusters for train data and targets 
+    tx0 = tx[id0]
+    tx1 = tx[id1]
+    tx2 = tx[id2]
+    tx3 = tx[id3]
+    if y is not None:
+        y0 = y[id0]
+        y1 = y[id1]
+        y2 = y[id2]
+        y3 = y[id3]
+        print("Using a training set. \n Returning clusterized dataset and targets. \n")
+        return tx0, y0, tx1, y1, tx2, y2, tx3, y3
+    #When y is None, i.e. when only input is a test-set
+    #Returns the clustermust also return indices
+    #to use for prediction
+    elif y is None:
+        print("Using a test-set. \n Returning clusterized dataset and indices. \n")
+        return tx0, id0, tx1, id1, tx2, id2, tx3, id3
+    
