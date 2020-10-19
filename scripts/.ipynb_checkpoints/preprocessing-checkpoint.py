@@ -71,7 +71,11 @@ def sample_data(y, x, size_samples):
 #=========================================================================#
 #========                 Pre-processing functions                ========#
 #=========================================================================#
+<<<<<<< Updated upstream
             
+=======
+
+>>>>>>> Stashed changes
 def standardize(x):
     """Standardize the data-set to have 0 mean and unit variance"""
     mean_x = np.mean(x)
@@ -91,3 +95,69 @@ def build_poly(x, degree):
         #takes all entries of x, power it.
         #each row is the new data entry with *degree* extra features 
     return poly
+<<<<<<< Updated upstream
+=======
+
+
+def convert_label(y):
+    """converts the labels into 0 or 1 for log reg"""
+    #copy to prevent unwanted inplace value assignment
+    bin_y = y.copy()
+    #using fancy numpy indexing
+    bin_y[bin_y==-1]=0
+    return bin_y
+
+
+def replace_999_nan(tx):
+    """Replaces all -999 values by NaN, allows easier processing below"""
+    tx[tx==-999]= np.nan
+    return tx
+
+
+def replace_999_mean(tx):
+    """Replaces all -999 values by the *mean* of their column.
+       First replaces all abherrant values by NaN, then compute the *mean*,
+       ignoring those values, then replacing NaNs by the computed *mean*.
+    """
+    tx = replace_999_nan(tx) #replace -999 by NaN
+    mean_of_feat = np.nanmean(tx,axis = 0) #mean of columns 
+    inds = np.where(np.isnan(tx)) #calculate index
+    tx[inds] = np.take(mean_of_feat, inds[1]) #replace NaN by mean
+    return tx
+
+
+def replace_999_mean(tx):
+    """Replaces all -999 values by the *median* of their column.
+       First replaces all abherrant values by NaN, then compute the *median*,
+       ignoring those values, then replacing NaNs by the computed *median*.
+    """
+    tx = replace_999_nan(tx) #replace -999 by NaN
+    mean_of_feat = np.nanmedian(tx,axis = 0) #median of columns 
+    inds = np.where(np.isnan(tx)) #calculate index
+    tx[inds] = np.take(mean_of_feat, inds[1]) #replace NaN by median
+    return tx
+
+
+def replace_outliers(tx, conf_level = 1):
+    """Replaces outliers that aren't in the defined confidence interval by the median
+       Input : tx (np.array), 
+               conf_level (int), takes values : 0 (68%), 1 (95%), 2 (99.7%)
+       Output : tx (np.array), without outliers
+    """
+    if conf_level ~in [0,1,2]:
+        conf_level = 1;
+    #Computing mean, standard deviation, median of all features column-wise
+    mean_of_feat = np.nanmean( tx, axis = 0)
+    std_of_feat = np.nanstd( tx, axis = 0)
+    med_of_feat = np.nanmedian( tx, axis = 0)
+    #Getting the boundaries of the confidence interval
+    max_conf_int = mean_of_feat + (int_conf+1) * std_of_feat / np.sqrt( len( tx[0] ) )
+    min_conf_int = mean_of_feat - (int_conf+1) * std_of_feat / np.sqrt( len( tx[0] ) )
+    
+    for i in range( len( tx[0] ) ):
+        print('in feature index', i, np.count_nonzero( ( tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i] ) ), 'outliers, with confidence intervalle', int_conf ) #can be put in comment
+        tx_train_without_out = np.where( (tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i]) , med_of_feat[i], tx) #replace values if it isn't in Confidence intervalle
+        
+    return tx_train_without_out 
+
+>>>>>>> Stashed changes
