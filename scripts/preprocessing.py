@@ -80,7 +80,12 @@ def standardize(x):
     x = x / std_x
     return x, mean_x, std_x
 
-
+def add_bias(tx):
+    """Adds a bias at the beginning of an dataset.
+       Input : tx, np.array of dim N x D
+       Output : tx_biased, np.array of dim N x (D+1)
+    """
+    return  np.c_[np.ones((tx.shape[0], 1)),tx]
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
     poly = np.ones((len(x), 1))
@@ -121,7 +126,7 @@ def replace_999_mean(tx):
     return tx_out
 
 
-def replace_999_mean(tx):
+def replace_999_median(tx):
     """Replaces all -999 values by the *median* of their column.
        First replaces all abherrant values by NaN, then compute the *median*,
        ignoring those values, then replacing NaNs by the computed *median*.
