@@ -43,7 +43,7 @@ def predict_labels_log(weights, data):
     y_pred[y_pred >0.5] = 1
     y_pred[y_pred <=0.5] = -1
     
-    return y_pred
+    return np.squeeze(y_pred)
 
 def create_csv_submission(ids, y_pred, name):
     """
