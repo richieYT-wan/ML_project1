@@ -2,9 +2,8 @@
 """some helper functions for project 1."""
 import csv
 import numpy as np
-from costs import sigmoid
 import matplotlib.pyplot as plt
-
+from costs import sigmoid
 
 def load_csv_data(data_path, sub_sample=False):
     """Loads data and returns y (class labels), tX (features) and ids (event ids)"""
@@ -62,14 +61,18 @@ def create_csv_submission(ids, y_pred, name):
             writer.writerow({'Id':int(r1),'Prediction':int(r2)})
 
             
-def histogram_clusters(tx0,tx1,tx2,tx3,header="../data/train.csv"):
+def histogram_clusters(tx0,tx1,tx2,tx3,data_path="../data/train.csv"):
     """
-    Function to visualize the distribution of all features after having been clustered.
+    Function to visualize the distribution of all features after having been clustered. 
+    Input : datamatrix of each cluster (tx0 to tx3)
     
     """
     fig, axes = plt.subplots(10,3,figsize=(8,20),sharex=False,sharey =False,)
     a = axes.ravel()
-    
+    #Getting the header.
+    x = np.genfromtxt(data_path, delimiter = ",", skip_header = 0,
+                 names = True,max_rows=1)
+    header = x.dtype.names[2:]
     for idx,ax in enumerate(a[:]):        
         
         ax.hist(tx0[:,idx],bins=500,stacked=True, histtype='stepfilled',alpha=0.5, label = "Cluster 0", color="cornflowerblue")
@@ -81,7 +84,7 @@ def histogram_clusters(tx0,tx1,tx2,tx3,header="../data/train.csv"):
         ax.legend(loc='best',fontsize="x-small")
         ax.autoscale()
 
-        ax.set_title(header[idx+2])
+        ax.set_title(header[idx])
     plt.tight_layout() 
     plt.show()
 
