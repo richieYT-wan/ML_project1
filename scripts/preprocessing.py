@@ -189,13 +189,13 @@ def prijetnum_clustering(tx,y=None,jetcol=22):
         y1 = y[id1]
         y2 = y[id2]
         y3 = y[id3]
-        print("Using a training set. \n Returning clusterized dataset and targets. \n")
+        print("Prediction targets detected. Using a training set. \n Returning clusterized dataset and targets. \n")
         return tx0, y0, tx1, y1, tx2, y2, tx3, y3
     #When y is None, i.e. when only input is a test-set
     #Returns the clustermust also return indices
     #to use for prediction
     elif y is None:
-        print("Using a test-set. \n Returning clusterized dataset and indices. \n")
+        print("No targets detected. Using a test-set. \n Returning clusterized dataset and indices. \n")
         return tx0, id0, tx1, id1, tx2, id2, tx3, id3
     
 def delete_features(tx):

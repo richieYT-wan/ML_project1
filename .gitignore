@@ -1,2 +1,6 @@
 
 data/test.csv
+scripts/.ipynb_checkpoints/preprocessing-checkpoint.py
+scripts/.ipynb_checkpoints/project1_clusteringtest-checkpoint.ipynb
+scripts/__pycache__/preprocessing.cpython-37.pyc
+scripts/__pycache__/proj1_helpers.cpython-37.pyc
