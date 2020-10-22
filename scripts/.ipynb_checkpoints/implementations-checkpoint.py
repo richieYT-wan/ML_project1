@@ -4,7 +4,10 @@ from proj1_helpers import *
 from costs import *
 from preprocessing import *
 
-"""Implements the functions ("ML methods") required by the project 1 guidelines"""
+"""
+Implements the functions ("ML methods") required by the project 1 guidelines
+Unique (sole) author : Richie Yat-tsai Wan (258934)
+"""
 #=========================================================================#
 #========                   Required functions                    ========#
 #=========================================================================#
@@ -78,31 +81,45 @@ def ridge_regression(y, tx, lambda_):
     return w, loss
 
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=1.5e-5):
     """Logistic regression using gradient descent or SGD
     Labels must be binary, i.e. y : {0;1}
     """
+    y = convert_label(y)
     w = initial_w
-    #Creating a list like this allows to plot the loss.
-    #Will be removed once we are done testing things.
+
+    
     losses=[]
+    print("Iterating over {} epochs".format(max_iters))
     for i in range(max_iters):
         w = w - gamma*compute_log_gradient(y, tx, w)
         loss = compute_logloss(y,tx,w)
-        losses.append(loss)    
+        losses.append(loss)   
+        #break out of iterations if almost no change
+        if i>10 and np.abs(losses[-1]-losses[-2]) < tol:
+            print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
+            break
     #Returning all three compononents to allow plotting
     return w, losses[-1], losses
 
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, tol=1.1e-5):
     """Regularized logistic regression using gradient descent or SGD"""
+    y = convert_label(y)
     w = initial_w
     losses = []
+    #setting tolerance for early convergence.
+
+    print("Iterating over {} epochs".format(max_iters))
     for i in range(max_iters):
         loss = compute_logloss(y, tx, w) + 0.5*lambda_*np.squeeze(w.T.dot(w))
         gradient = compute_log_gradient(y, tx, w) + 2*lambda_* w
         w = w - gamma*gradient
         losses.append(loss)
+        #break out of iterations if almost no change
+        if i>10 and np.abs(losses[-1]-losses[-2]) < tol:
+            print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
+            break
     
     return w, losses[-1], losses
 
