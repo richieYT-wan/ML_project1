@@ -33,8 +33,9 @@ def compute_log_gradient(y, tx, w):
     """
     sig = sigmoid(tx.dot(w))
     #reshaping, we had broadcasting issues.
-    grad = tx.T.dot(sig-(y.reshape(sig.shape)))
+    grad = (tx.T.dot(sig-(y.reshape(sig.shape))))
     return grad
+
 
 #=========================================================================#
 #========                     Cost functions                      ========#

@@ -21,34 +21,35 @@ tx0, y0, tx1, y1, tx2, y2, tx3, y3, id0, id1, id2, id3 = cluster_preprocessing_t
 k_fold=5
 #USING FEWER ITERATIONS DUE TO HOW MASSIVE THIS GRIDSEARCH IS.
 n_iters = 1500
-gamma = 2.3e-6
-lambdas = np.logspace(-9,-1,11)
-degrees = np.array(range(1,12))
+gamma = 2.2e-6
+lambdas = np.logspace(-7,2,4)
+degrees = np.array(range(1,3))
+file1 = open("bestparams_regulogANOTHER.txt","w") 
 
 print("#======== CV for Cluster 0 ========#")
 wlog0, dlog0, la0, train0, test0 = crossval_regulog_gridsearch(y0,tx0,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             n_iters,gamma,loss=True,tol=1e-6)
 cv_viz(dlog0,lambdas,train0[dlog0-1,:],test0[dlog0-1,:],save="regulog_clust0")
 #----------------1
 print("#======== CV for Cluster 1 ========#")
 wlog1, dlog1, la1, train1, test1 = crossval_regulog_gridsearch(y1,tx1,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             n_iters,gamma,loss=True,tol=1e-6)
 cv_viz(dlog1,lambdas,train1[dlog1-1,:],test0[dlog1-1,:],save="regulog_clust1")
 
 #----------------2
 print("#======== CV for Cluster 2 ========#")
 wlog2, dlog2, la2, train2, test2 = crossval_regulog_gridsearch(y2,tx2,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             n_iters,gamma,loss=True,tol=1e-6)
 cv_viz(dlog2,lambdas,train2[dlog2-1,:],test0[dlog2-1,:],save="regulog_clust2")
 
 #----------------3
 print("#======== CV for Cluster 3 ========#")
 wlog3, dlog3, la3, train3, test3 = crossval_regulog_gridsearch(y3,tx3,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             n_iters,gamma,loss=True,tol=1e-6)
 cv_viz(dlog3,lambdas,train3[dlog3-1,:],test0[dlog3-1,:],save="regulog_clust3")
 
 degs=[dlog0,dlog1,dlog2,dlog3]
@@ -72,6 +73,5 @@ create_csv_submission(ids_test, yclusterpred_log, OUTPUT_PATH+"CV_GRIDSEARCH_reg
 
 
 best = "degs = {},{},{},{} \n lambdas = {:e}, \n {:e}, \n {:e} \n {:e}".format(dlog0,dlog1,dlog2,dlog3,la0,la1,la2,la3)
-file1 = open("bestparams_regulog.txt","w") 
 file1.write(best)
 file1.close()

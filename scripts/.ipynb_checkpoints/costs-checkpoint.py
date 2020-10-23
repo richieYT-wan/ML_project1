@@ -33,8 +33,9 @@ def compute_log_gradient(y, tx, w):
     """
     sig = sigmoid(tx.dot(w))
     #reshaping, we had broadcasting issues.
-    grad = tx.T.dot(sig-(y.reshape(sig.shape)))
+    grad = (tx.T.dot(sig-(y.reshape(sig.shape))))
     return grad
+
 
 #=========================================================================#
 #========                     Cost functions                      ========#
@@ -83,4 +84,5 @@ def compute_logloss(y, tx, w):
     #Add a infinitesimally small value to avoid log(0)
     loss = -1*( y.T.dot(np.log(sig+1e-8))+(1-y).T.dot(np.log(1-sig+1e-8)))
     
+    #dividing by N, can be changed later, doesnt really change anything.
     return np.squeeze(loss)/len(y)

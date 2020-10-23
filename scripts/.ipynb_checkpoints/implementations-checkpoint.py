@@ -32,10 +32,9 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     Using a minibatch size of 1, random and shuffled minibatches 
     are generated using the batch_iter function 
     """
-    #Initializing values + sanity check to make sure target (y) labels are binary 
+    #Initializing values 
     w = initial_w
     loss = 0
-    y = preprocessing.convert_label(y)
     for i in range(max_iters):
         for y_batch, tx_batch in batch_iter(y, tx, batch_size=1, num_batches=1):
             gradient = compute_stoch_gradient(y_batch, tx_batch, w)
@@ -81,7 +80,7 @@ def ridge_regression(y, tx, lambda_):
     return w, loss
 
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=1.5e-5):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=5e-6):
     """Logistic regression using gradient descent or SGD
     Labels must be binary, i.e. y : {0;1}
     """
@@ -96,34 +95,29 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=1.5e-5):
         loss = compute_logloss(y,tx,w)
         losses.append(loss)   
         #break out of iterations if almost no change
-        if i>10 and np.abs(losses[-1]-losses[-2]) < tol:
+        if i>(1/3)*max_iters and np.abs(losses[-1]-losses[-2]) < tol:
             print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
             break
     #Returning all three compononents to allow plotting
     return w, losses[-1], losses
 
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, tol=1.1e-5):
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, tol=5e-6):
     """Regularized logistic regression using gradient descent or SGD"""
     y = convert_label(y)
     w = initial_w
     losses = []
     #setting tolerance for early convergence.
 
-    #print("Iterating over {} epochs".format(max_iters))
-    
     for i in range(max_iters):
         loss = compute_logloss(y, tx, w) + 0.5*lambda_*np.squeeze(w.T.dot(w))
         gradient = compute_log_gradient(y, tx, w) + 2*lambda_* w
         w = w - gamma*gradient
         losses.append(loss)
         #break out of iterations if almost no change
-        if i>150 and np.abs(losses[-1]-losses[-2]) < tol:
+        if i>(1/3)*max_iters and np.abs(losses[-1]-losses[-2]) < tol:
             print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
             break
     
     return w, losses[-1], losses
-
-
-
 

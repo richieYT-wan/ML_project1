@@ -111,7 +111,7 @@ def crossval_ridge_gridsearch(y, tx_clust, k_fold, lambdas, degrees, loss=False)
     
     
 
-def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=2.5e-6,tol = 1.5e-5):
+def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=2.5e-6,tol = 1.25e-5):
     """return the losses and weights of regularized log regression for a given 
        value of lambda, gamma,"""
     # get k'th subgroup in test, others in train
@@ -131,7 +131,7 @@ def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=
 
 def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees, 
                                 max_iters= 1500, gamma = 2.5e-6, loss= False,
-                                tol = 1.5e-5):
+                                tol = 1.25e-6):
     """
     Input : y (target), np.array
             tx (dataset), np.array
@@ -168,7 +168,7 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
         for id_lam, lambda_ in enumerate(lambdas):
             train_loss_tmp = []
             test_loss_tmp = []
-            
+            print("newlambda")
             for k in range(k_fold):
                 train_loss, test_loss, _, _ = cross_validation_regulog(y, tx_poly, k_indices, k,
                                                                    lambda_, max_iters, gamma,tol)
@@ -195,7 +195,7 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
     initial_w = np.random.randn(tx_poly_best.shape[1],1)
     #More iterations + lower tolerance to optimize more (if possible).
     w_opt, _, _ = reg_logistic_regression(y,tx_poly_best, best_lambda,
-                                    initial_w, 2000, gamma, tol=5e-6)
+                                    initial_w, 2000, gamma, tol=1e-7)
     
     
     if loss==False:
