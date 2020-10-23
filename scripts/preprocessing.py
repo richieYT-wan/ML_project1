@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
    
    "Pre-processing" functions will be able to modify or add features, filter, 
    remove corrupted data such as entries with -999 values, etc.
+   
+   Main author (90%+) : Richie Yat-tsai Wan (258934)
 """
 
 #=========================================================================#
@@ -78,7 +80,7 @@ def standardize(x):
     x = x - mean_x
     std_x = np.std(x)
     x = x / std_x
-    return x, mean_x, std_x
+    return x
 
 def add_bias(tx):
     """Adds a bias at the beginning of an dataset.
@@ -86,15 +88,16 @@ def add_bias(tx):
        Output : tx_biased, np.array of dim N x (D+1)
     """
     return  np.c_[np.ones((tx.shape[0], 1)),tx]
+
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    
+    #adding bias
     poly = np.ones((len(x), 1))
+    
     for deg in range(1, degree+1):
         poly = np.c_[poly, np.power(x, deg)]
-        #np.c_ adds (stacks) an extra column to poly, 
-        #extra column = np.power(x,deg)
-        #takes all entries of x, power it.
-        #each row is the new data entry with *degree* extra features 
+        
     return poly
 
 
@@ -144,18 +147,18 @@ def replace_outliers(tx, conf_level = 1):
                conf_level (int), takes values : 0 (68%), 1 (95%), 2 (99.7%)
        Output : tx (np.array), without outliers
     """
-    if conf_level in ~[0,1,2]:
+    if conf_level is None:
         conf_level = 1;
     #Computing mean, standard deviation, median of all features column-wise
     mean_of_feat = np.nanmean( tx, axis = 0)
     std_of_feat = np.nanstd( tx, axis = 0)
     med_of_feat = np.nanmedian( tx, axis = 0)
     #Getting the boundaries of the confidence interval
-    max_conf_int = mean_of_feat + (int_conf+1) * std_of_feat / np.sqrt( len( tx[0] ) )
-    min_conf_int = mean_of_feat - (int_conf+1) * std_of_feat / np.sqrt( len( tx[0] ) )
+    max_conf_int = mean_of_feat + (conf_level+1) * std_of_feat / np.sqrt( len( tx[0] ) )
+    min_conf_int = mean_of_feat - (conf_level+1) * std_of_feat / np.sqrt( len( tx[0] ) )
     
     for i in range( len( tx[0] ) ):
-        print('in feature index', i, np.count_nonzero( ( tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i] ) ), 'outliers, with confidence intervalle', int_conf ) #can be put in comment
+        #print('in feature index', i, np.count_nonzero( ( tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i] ) ), 'outliers, with confidence intervalle', conf_level) #can be put in comment
         tx_train_without_out = np.where( (tx[i] > max_conf_int[i]) | (tx[i] < min_conf_int[i]) , med_of_feat[i], tx) #replace values if it isn't in Confidence intervalle
         
     return tx_train_without_out 
@@ -223,3 +226,238 @@ def reexpand_w(w, idx):
     for i in range(len(idx)):
         w_re = np.insert(w_re, idx[i], 0)
     return w_re
+
+#=========================================================================#
+#========              Cluster-processing functions               ========#
+#=========================================================================#
+
+def cluster_log(tx0,tx1,tx2,tx3, feat):
+    """
+    Returns the data sets with a natural logarithm applied to the selected features
+    """
+    t0 = np.copy(tx0)
+    t1 = np.copy(tx1)
+    t2 = np.copy(tx2)
+    t3 = np.copy(tx3)    
+    t0[:,feat] = np.log(t0[:,feat]+0.01)
+    t1[:,feat] = np.log(t1[:,feat]+0.01)
+    t2[:,feat] = np.log(t2[:,feat]+0.01)
+    t3[:,feat] = np.log(t3[:,feat]+0.01)
+    return t0, t1, t2, t3
+
+def cluster_std(t0,t1,t2,t3):
+    """
+    Standardizes the clusterized datasets
+    """
+    t0 = standardize(t0)
+    t1 = standardize(t1)
+    t2 = standardize(t2)
+    t3 = standardize(t3)
+    return t0, t1, t2, t3
+
+def cluster_replace(t0,t1,t2,t3,f="mean"):
+    """
+    Replaces remaining -999 values for all sets, using f. f is mean by default
+    Should be used after delete_features.
+    """
+    if f == "mean":
+        print("Replacing -999 values with mean")
+        t0=replace_999_mean(t0)
+        t1=replace_999_mean(t1)
+        t2=replace_999_mean(t2)
+        t3=replace_999_mean(t3)
+    if f == "median":
+        print("Replacing -999 values with median")
+        t0=replace_999_median(t0)
+        t1=replace_999_median(t1)
+        t2=replace_999_median(t2)
+        t3=replace_999_median(t3)
+    if f!="mean" and f!="median":
+        print("Invalid f detected. Returning un-processed datasets")
+    return t0, t1, t2, t3
+
+
+
+def cluster_buildpoly(t0,t1,t2,t3,degs):
+    "build_poly() function for all clusters w.r.t to their optimal degree found during crossvalidation"
+    
+    t0 = build_poly(t0,degs[0])
+    t1 = build_poly(t1,degs[1])
+    t2 = build_poly(t2,degs[2])
+    t3 = build_poly(t3,degs[3])
+    
+    return t0, t1, t2, t3
+
+
+
+def cluster_preprocessing_train(tx_train,y,num2name, f="mean"):
+    """
+    input : tx_train (np.array), whole training set
+            y (np.array), whole training target
+            f (str), = "mean" or "median" or write anything else to ignore
+            num2name (dict), the keys mapping feature numbers to their name. (See proj1_helpers: mapping)
+
+    Pre-process whole training dataset. Clusters them w.r.t. PRIjetnum, applying log to wanted features,
+    Removing features with all -999 rows, replacing remaning -999 values with f (mean by default)
+    Standardizes and returns all sets, targets, and deleted column indices.
+    """
+    
+    print("PREPROCESSING TRAIN DATA \n Clustering w.r.t. to PRI_jet_num numbers")
+    tx0, y0, tx1, y1, tx2, y2, tx3, y3 = prijetnum_clustering(tx_train,y)
+    print("REMOVING LAST COL for TX0")
+    tx0 = np.delete(tx0,-1,1)
+    #Logarithm of selected features with long-tail distribution
+    log_features = [1,2,3,8,9,10,13,16,19,21]
+    print("Taking the log of the following features : \n",[num2name.get(key) for key in log_features])
+    tx_df0, tx_df1, tx_df2, tx_df3 = cluster_log(tx0,tx1,tx2,tx3,log_features)
+
+    #Deleting features with all -999 rows
+    print("Removing features with all -999 rows. Returning indices for later")
+    tx_df0, id_del0 = delete_features(tx_df0)
+    tx_df1, id_del1 = delete_features(tx_df1)
+    tx_df2, id_del2 = delete_features(tx_df2)
+    tx_df3, id_del3 = delete_features(tx_df3)
+    
+    ##Replacing remaining -999 values with the mean or median of that feature
+    tx_df0, tx_df1, tx_df2, tx_df3 = cluster_replace(tx_df0, tx_df1, tx_df2, tx_df3,f)
+    
+    #Standardizing
+    print("Standardizing : Setting mean to 0 and variance to 1")
+    tx_df0, tx_df1, tx_df2, tx_df3 = cluster_std(tx_df0, tx_df1, tx_df2, tx_df3)
+    
+    print("Preprocessing done")
+    return tx_df0, y0, tx_df1, y1, tx_df2, y2, tx_df3, y3, id_del0, id_del1, id_del2, id_del3
+
+
+
+def cluster_preprocessing_test(tX_test, id_del0, id_del1, id_del2, id_del3, degs, num2name,f="mean"):
+    """
+    input : tx_train (np.array), whole training set
+            id_del0, ..., id_del3, indices of deleted columns returned by 
+            degs (list), degrees for build_poly found during crossvalidation gridsearch
+            num2name (dict), the keys mapping feature numbers to their name. (See proj1_helpers: mapping)
+            f (str), = "mean" or "median" or write anything else to ignore.
+
+    Pre-process whole training dataset. Clusters them w.r.t. PRIjetnum, applying log to wanted features,
+    Removing features with all -999 rows, replacing remaning -999 values with f (mean by default)
+    Standardizes and returns all sets, targets, and deleted column indices.
+    """    
+    print("PREPROCESSING TEST DATA \n Clustering w.r.t. to PRI_jet_num numbers")
+    test0, i0, test1, i1, test2, i2, test3, i3, = prijetnum_clustering(tX_test)
+    print("REMOVING LAST COL for TX0")
+    test0 = np.delete(test0,-1,1)
+    #Logarithm of selected features with long-tail distribution
+    log_features = [1,2,3,8,9,10,13,16,19,21]
+    print("Taking the log of the following features : \n",[num2name.get(key) for key in log_features])
+    test0,test1,test2,test3 = cluster_log(test0,test1,test2,test3,log_features)
+
+    #Deleting features with all -999 rows, ID from pre_processing_train
+    print("deleting corresponding columns")
+    test0 = np.delete(test0,id_del0,1)
+    test1 = np.delete(test1,id_del1,1) 
+    test2 = np.delete(test2,id_del2,1) 
+    test3 = np.delete(test3,id_del3,1) 
+    ##Replacing remaining -999 values with the mean or median of that feature
+    test0, test1, test2, test3 = cluster_replace(test0, test1, test2, test3, f)
+    #Standardizing
+    print("Standardizing : Setting mean to 0 and variance to 1")
+    test0, test1, test2, test3 = cluster_std(test0, test1, test2, test3)
+    #Augmenting features w.r.t. optimal degrees found during CV.
+    print("Augmenting features")
+    test0, test1, test2, test3 = cluster_buildpoly(test0,test1,test2,test3,degs)
+    
+    print("Preprocessing done, returning clusterized test set and indices")
+    
+    return test0, i0, test1, i1, test2, i2, test3, i3
+
+#####################################################
+
+
+
+def cluster_preprocessing_train_alt(tx_train,y,num2name, f="median"):
+    """
+    input : tx_train (np.array), whole training set
+            y (np.array), whole training target
+            f (str), = "mean" or "median" or write anything else to ignore
+            num2name (dict), the keys mapping feature numbers to their name. (See proj1_helpers: mapping)
+
+    ALT IS TO PROCESS BEFORE CLUSTERING
+    """
+    tx = tx_train.copy()
+    print("PREPROCESSING TRAIN DATA \n Clustering w.r.t. to PRI_jet_num numbers")
+    clustid0, clustid1, clustid2, clustid3= prijetnum_indexing(tx)
+    #Deleting features with all -999 rows
+    print("Removing features with all -999 rows for cluster 0 and 1. Returning indices for later")
+    _, id_del0 = delete_features(tx[clustid0])
+    _, id_del1 = delete_features(tx[clustid1])
+
+    ##Replacing remaining -999 values with the mean or median of that feature
+
+    tx= replace_by_median(tx)
+
+    #Logarithm of selected features with long-tail distribution
+    log_features = [0,1,2,3,7,8,9,10,13,16,19,21]
+    print("Taking the log of the following features : \n",[num2name.get(key) for key in log_features])
+    #shift to avoid log(0)
+    tx[:,log_features] = np.log(tx[:,log_features]+.5)
+     
+        #Standardizing
+    print("Standardizing : Setting mean to 0 and variance to 1")
+    tx = standardize(tx)
+    
+
+    print("CLUSTERING")
+    tx0,tx1,tx2,tx3 = tx[clustid0], tx[clustid1], tx[clustid2], tx[clustid3]
+    y0, y1, y2, y3 = y[clustid0], y[clustid1], y[clustid2], y[clustid3]
+    print("deleting useless feats")
+    tx0 = np.delete(tx0,id_del0,1)
+    tx1 = np.delete(tx1,id_del1,1)
+
+   
+    
+    print("Preprocessing done")
+    return tx0, y0, tx1, y1, tx2, y2, tx3, y3, id_del0, id_del1
+
+
+
+def cluster_preprocessing_test_alt(tX_test, id_del0, id_del1, degs, num2name,f="mean"):
+    """
+    input : tx_train (np.array), whole training set
+            id_del0, ..., id_del3, indices of deleted columns returned by 
+            degs (list), degrees for build_poly found during crossvalidation gridsearch
+            num2name (dict), the keys mapping feature numbers to their name. (See proj1_helpers: mapping)
+            f (str), = "mean" or "median" or write anything else to ignore.
+
+    Pre-process whole training dataset. Clusters them w.r.t. PRIjetnum, applying log to wanted features,
+    Removing features with all -999 rows, replacing remaning -999 values with f (mean by default)
+    Standardizes and returns all sets, targets, and deleted column indices.
+    """    
+    print("replace by median")
+    i0, i1, i2, i3 = prijetnum_indexing(tX_test)
+    tx_t = replace_by_median(tX_test)
+    
+    #Logarithm of selected features with long-tail distribution
+    log_features = [0,1,2,3,7,8,9,10,13,16,19,21]
+    print("Taking the log of the following features : \n",[num2name.get(key) for key in log_features])
+    #shift to avoid log(0)
+    tx_t[:,log_features] = np.log(tx_t[:,log_features]+.5)
+    
+    print("Standardizing")
+    tx_t = standardize(tx_t)
+    
+    print("CLUSTERING")
+    test0, test1, test2, test3 = tx_t[i0], tx_t[i1], tx_t[i2], tx_t[i3]
+    #Deleting features with all -999 rows, ID from pre_processing_train
+    print("deleting corresponding columns")
+    test0 = np.delete(test0,id_del0,1)
+    test1 = np.delete(test1,id_del1,1) 
+
+    
+    print("Augmenting features")
+    test0, test1, test2, test3 = cluster_buildpoly(test0,test1,test2,test3,degs)
+    
+    print("Preprocessing done, returning clusterized test set and indices")
+    
+    return test0, i0, test1, i1, test2, i2, test3, i3
+
+
