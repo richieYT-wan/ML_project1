@@ -5,7 +5,6 @@ from implementations import *
 from preprocessing import *
 from train_tune import *
 from proj1_helpers import *
-#import pandas as pd
 
 DATA_TRAIN_PATH = '../data/train.csv' # TODO: download train data and supply path here 
 
@@ -26,27 +25,27 @@ degrees = np.array(range(1,12))
 print("#======== CV for Cluster 0 ========#")
 w_opt0, d_opt0, la0, train0, test0 = crossval_ridge_gridsearch(y0,tx0,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             loss=True)
 cv_viz(d_opt0,lambdas,train0[d_opt0-1,:],test0[d_opt0-1,:],save="ridge_clust0")
 #----------------1
 print("#======== CV for Cluster 1 ========#")
 w_opt1, d_opt1, la1, train1, test1 = crossval_ridge_gridsearch(y1,tx1,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             loss=True)
 cv_viz(d_opt1,lambdas,train1[d_opt1-1,:],test0[d_opt1-1,:],save="ridge_clust1")
 
 #----------------2
 print("#======== CV for Cluster 2 ========#")
 w_opt2, d_opt2, la2, train2, test2 = crossval_ridge_gridsearch(y2,tx2,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             loss=True)
 cv_viz(d_opt2,lambdas,train2[d_opt2-1,:],test0[d_opt2-1,:],save="ridge_clust2")
 
 #----------------3
 print("#======== CV for Cluster 3 ========#")
 w_opt3, d_opt3, la3, train3, test3 = crossval_ridge_gridsearch(y3,tx3,k_fold,
                                                              lambdas,degrees,
-                                                             n_iters,gamma,loss=True)
+                                                             loss=True)
 cv_viz(d_opt3,lambdas,train3[d_opt3-1,:],test0[d_opt3-1,:],save="ridge_clust3")
 
 degs=[d_opt0,d_opt1,d_opt2,d_opt3]

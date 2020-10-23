@@ -140,34 +140,6 @@ def replace_999_median(tx):
     tx_out[inds] = np.take(med_of_feat, inds[1]) #replace NaN by median
     return tx_out
 
-#def replace_999_median_alt(tx):
-#    """Replaces all -999 values by the *median* of their column.
-#       First replaces all abherrant values by NaN, then compute the *median*,
-#       ignoring those values, then replacing NaNs by the computed *median*.
-#    """
-#    tx_med = tx.copy()
-#    vals = tx_med[np.where(tx_med)]
-#    median = np.median(vals,axis=0)
-#    
-#    med_of_feat = np.nanmedian(tx_out,axis = 0) #median of columns 
-#    inds = np.where(np.isnan(tx_out)) #calculate index
-#    tx_out[inds] = np.take(med_of_feat, inds[1]) #replace NaN by median
-#    return tx_out
-#
-def replace_by_median(tx):
-    """
-    CHANGE LATER
-    """
-    tx_med = tx.copy()
-    for data in tx_med.T:   
-        values = data[np.where(data != -999.)] 
-        if np.any(np.isnan(values)): 
-            med= 0 
-        else: 
-            med = np.median(values) #
-        data[np.where(data == -999.)] = med
-
-    return tx_med
 
 def replace_outliers(tx, conf_level = 1):
     """Replaces outliers that aren't in the defined confidence interval by the median
@@ -332,7 +304,8 @@ def cluster_preprocessing_train(tx_train,y,num2name, f="mean"):
     
     print("PREPROCESSING TRAIN DATA \n Clustering w.r.t. to PRI_jet_num numbers")
     tx0, y0, tx1, y1, tx2, y2, tx3, y3 = prijetnum_clustering(tx_train,y)
-    
+    print("REMOVING LAST COL for TX0")
+    tx0 = np.delete(tx0,-1,1)
     #Logarithm of selected features with long-tail distribution
     log_features = [1,2,3,8,9,10,13,16,19,21]
     print("Taking the log of the following features : \n",[num2name.get(key) for key in log_features])
@@ -371,7 +344,8 @@ def cluster_preprocessing_test(tX_test, id_del0, id_del1, id_del2, id_del3, degs
     """    
     print("PREPROCESSING TEST DATA \n Clustering w.r.t. to PRI_jet_num numbers")
     test0, i0, test1, i1, test2, i2, test3, i3, = prijetnum_clustering(tX_test)
-    
+    print("REMOVING LAST COL for TX0")
+    test0 = np.delete(test0,-1,1)
     #Logarithm of selected features with long-tail distribution
     log_features = [1,2,3,8,9,10,13,16,19,21]
     print("Taking the log of the following features : \n",[num2name.get(key) for key in log_features])
@@ -442,7 +416,7 @@ def cluster_preprocessing_train_alt(tx_train,y,num2name, f="median"):
    
     
     print("Preprocessing done")
-    return tx_df0, y0, tx_df1, y1, tx_df2, y2, tx_df3, y3, id_del0, id_del1
+    return tx0, y0, tx1, y1, tx2, y2, tx3, y3, id_del0, id_del1
 
 
 
