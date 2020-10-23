@@ -111,7 +111,7 @@ def crossval_ridge_gridsearch(y, tx_clust, k_fold, lambdas, degrees, loss=False)
     
     
 
-def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=2.5e-6):
+def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=2.5e-6,tol = 1.5e-5):
     """return the losses and weights of regularized log regression for a given 
        value of lambda, gamma,"""
     # get k'th subgroup in test, others in train
@@ -120,7 +120,7 @@ def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=
 
     # Regulog regression
     w, _, losses = reg_logistic_regression(y_tr,tx_tr,lambda_,
-                                           initial_w, max_iters, gamma)
+                                           initial_w, max_iters, gamma,tol)
     
     # calculate the loss for train and test data
 
@@ -131,7 +131,7 @@ def cross_validation_regulog(y, tx, k_indices, k, lambda_, max_iters=1500,gamma=
 
 def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees, 
                                 max_iters= 1500, gamma = 2.5e-6, loss= False,
-                                losses_its=False):
+                                tol = 1.5e-5):
     """
     Input : y (target), np.array
             tx (dataset), np.array
@@ -156,9 +156,7 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
     total_train_loss = np.empty((len(degrees),len(lambdas)))
     total_test_loss = np.empty((len(degrees),len(lambdas)))
     #Creates a massive array for losses. massive memory also issue with early termination?
-    #if losses_its:
-    #    total_iteration_loss = np.empty((len(degrees),len(lambdas),max_iters))
-        
+   
     #Gridsearch loops.
     for id_deg, degree in enumerate(degrees):
         print("Iterating. Testing {} lambdas for current degree = {}".format(len(lambdas),degree))
@@ -171,21 +169,12 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
             train_loss_tmp = []
             test_loss_tmp = []
             
-            #if losses_its:
-            #    losses_graph = np.empty(k_fold,max_iters)
-                
             for k in range(k_fold):
                 train_loss, test_loss, _, _ = cross_validation_regulog(y, tx_poly, k_indices, k,
-                                                                   lambda_, max_iters, gamma)
+                                                                   lambda_, max_iters, gamma,tol)
                 
                 train_loss_tmp.append(train_loss)
                 test_loss_tmp.append(test_loss)
-                
-                #if losses_its:
-                #    losses_graph[k,:]=losses_tmp
-                
-            #if losses_its:
-            #    total_iteration_loss[id_deg,id_lam,:] = np.mean(losses_graph,axis=0)
                 
             lambda_train_loss.append(np.mean(train_loss_tmp))
             lambda_test_loss.append(np.mean(test_loss_tmp))
@@ -205,7 +194,7 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
     tx_poly_best = build_poly(tx_clust,best_degree)
     initial_w = np.random.randn(tx_poly_best.shape[1],1)
     #More iterations + lower tolerance to optimize more (if possible).
-    w_opt, _, _ = reg_log_regression(y,tx_poly_best, best_lambda,
+    w_opt, _, _ = reg_logistic_regression(y,tx_poly_best, best_lambda,
                                     initial_w, 2000, gamma, tol=5e-6)
     
     
@@ -216,5 +205,5 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
     elif loss:
         print("Done, returning optimal weight, degree, lambda \n And train and test loss arrays for visualization")
         return w_opt, best_degree, best_lambda, total_train_loss, total_test_loss
-    
+        
     

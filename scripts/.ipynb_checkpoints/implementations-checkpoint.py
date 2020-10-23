@@ -110,14 +110,15 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, tol=1.1
     losses = []
     #setting tolerance for early convergence.
 
-    print("Iterating over {} epochs".format(max_iters))
+    #print("Iterating over {} epochs".format(max_iters))
+    
     for i in range(max_iters):
         loss = compute_logloss(y, tx, w) + 0.5*lambda_*np.squeeze(w.T.dot(w))
         gradient = compute_log_gradient(y, tx, w) + 2*lambda_* w
         w = w - gamma*gradient
         losses.append(loss)
         #break out of iterations if almost no change
-        if i>10 and np.abs(losses[-1]-losses[-2]) < tol:
+        if i>150 and np.abs(losses[-1]-losses[-2]) < tol:
             print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
             break
     

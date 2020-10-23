@@ -75,7 +75,7 @@ def cluster_predict(w0,w1,w2,w3, t0,t1,t2,t3, i0,i1,i2,i3, how = "normal"):
         ypred_1 = predict_labels(w1, t1)
         ypred_2 = predict_labels(w2, t2)
         ypred_3 = predict_labels(w3, t3)
-        ypred = np.ones(ids_test.shape[0])
+        ypred = np.ones(i0.shape[0])
         ypred[i0]=ypred_0
         ypred[i1]=ypred_1
         ypred[i2]=ypred_2
@@ -88,7 +88,7 @@ def cluster_predict(w0,w1,w2,w3, t0,t1,t2,t3, i0,i1,i2,i3, how = "normal"):
         ypred_1 = predict_labels_log(w1, t1)
         ypred_2 = predict_labels_log(w2, t2)
         ypred_3 = predict_labels_log(w3, t3)
-        ypred = np.ones(ids_test.shape[0])
+        ypred = np.ones(i0.shape[0])
         ypred[i0]=ypred_0
         ypred[i1]=ypred_1
         ypred[i2]=ypred_2
@@ -207,13 +207,15 @@ def mapping(data_path ="../data/train.csv"):
     return map_to_names, map_to_numbers
 
 
-def cv_viz(degree,lambds, mse_tr, mse_te):
+def cv_viz(degree,lambds, mse_tr, mse_te,save=False):
     """visualization the curves of mse_tr and mse_te."""
     plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
     plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
     plt.xlabel("lambda")
     plt.ylabel("rmse")
-    plt.title("Cross validation : Degree={}".format(degree))
+    plt.title("Cross validation for {} : Degree={}".format(save, degree))
     plt.legend(loc=2)
     plt.grid(True)
-    #plt.savefig("cross_validation")
+    if save:
+        plt.savefig("../output/"+save+".png")
+        plt.close()
