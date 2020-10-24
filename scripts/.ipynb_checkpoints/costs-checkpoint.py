@@ -4,7 +4,7 @@
     methods. Also contains functions used for gradient steps such as sigmoid,
     calculate_hessian for logistic regression.
 """
-
+import math
 import numpy as np
 
 #=========================================================================#

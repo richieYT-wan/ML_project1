@@ -2,9 +2,9 @@
 """
     Implements the functions used to compute the loss and gradient of various
     methods. Also contains functions used for gradient steps such as sigmoid,
-    calculate_hessian for logistic regression.
+    for logistic regression.
 """
-
+import math
 import numpy as np
 
 #=========================================================================#

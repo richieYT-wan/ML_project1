@@ -207,3 +207,83 @@ def crossval_regulog_gridsearch(y, tx_clust, k_fold, lambdas, degrees,
         return w_opt, best_degree, best_lambda, total_train_loss, total_test_loss
         
     
+
+    
+def crossval_regulog_gridsearch_adaptive(y, tx_clust, k_fold, lambdas, degrees, gammas,
+                                max_iters= 1500, loss= False,
+                                tol = 1.25e-6):
+    """
+    Input : y (target), np.array
+            tx (dataset), np.array
+            k_fold, int, fold for Cross validation
+            lambdas, degrees : np.arrays containing the values to be tested.
+            loss, bool : If true, will return the train-test loss arrays, to be used in viz for plotting.
+            
+    Returns the lambda, degree and associated weight that optimizes
+    the RMSE loss for Ridge Regression using K-fold cross validation.
+    It is advisable to use clusterized and pre-processed tx as input 
+    in order to maximize data points in each of the cluster/k'th subgroup.
+    
+    Computes the best degree of polynomial expansion and its associated
+    optimal value of lambda.
+    """
+    #Initializing values. 
+    k_indices = build_k_indices(y, k_fold)
+    #Converting to binary labels for log prediction
+    y = convert_label(y)
+    #Get arrays of train and test loss for each degree (in axis=0), and each lambdas(in axis=1)
+    
+    total_train_loss = np.empty((len(degrees),len(lambdas)))
+    total_test_loss = np.empty((len(degrees),len(lambdas)))
+    #Creates a massive array for losses. massive memory also issue with early termination?
+   
+    #Gridsearch loops.
+    for id_deg, degree in enumerate(degrees):
+        print("Iterating. Testing {} lambdas for current degree = {}".format(len(lambdas),degree))
+        tx_poly = build_poly(tx_clust,degree)
+        lambda_train_loss = []
+        lambda_test_loss = []
+        losses_graphs=np.empty
+        gamma = gammas[id_deg]
+        for id_lam, lambda_ in enumerate(lambdas):
+            train_loss_tmp = []
+            test_loss_tmp = []
+            print("newlambda")
+            for k in range(k_fold):
+                train_loss, test_loss, _, _ = cross_validation_regulog(y, tx_poly, k_indices, k,
+                                                                   lambda_, max_iters, gamma,tol)
+                
+                train_loss_tmp.append(train_loss)
+                test_loss_tmp.append(test_loss)
+                
+            lambda_train_loss.append(np.mean(train_loss_tmp))
+            lambda_test_loss.append(np.mean(test_loss_tmp))
+                
+        total_train_loss[id_deg,:]=lambda_train_loss
+        total_test_loss[id_deg,:]=lambda_test_loss
+        
+    #Getting the best degree, values.
+    print("Getting best degree and lambda")
+    best_id = np.argwhere(total_test_loss==np.min(total_test_loss))[0,]
+    best_degree = degrees[best_id[0]]
+    best_lambda = lambdas[best_id[1]]
+    
+    #Getting optimized weight
+    print("ReguLog regression : getting optimal weights with best degree ({}), lambda ({})".format(best_degree,best_lambda))
+    
+    tx_poly_best = build_poly(tx_clust,best_degree)
+    initial_w = np.random.randn(tx_poly_best.shape[1],1)
+    #More iterations + lower tolerance to optimize more (if possible).
+    w_opt, _, _ = reg_logistic_regression(y,tx_poly_best, best_lambda,
+                                    initial_w, 2000, gamma, tol=1e-7)
+    
+    
+    if loss==False:
+        print("Done, returning optimal weight, degree, lambda.")
+        return w_opt, best_degree, best_lambda
+    
+    elif loss:
+        print("Done, returning optimal weight, degree, lambda \n And train and test loss arrays for visualization")
+        return w_opt, best_degree, best_lambda, total_train_loss, total_test_loss
+        
+    

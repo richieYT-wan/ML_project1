@@ -1,0 +1,4 @@
+Cluster 0 : best deg 1. lam 5.623413e-09 
+Cluster 1 : best deg 1. lam 1.000000e-03 
+Cluster 2 : best deg 1. lam 1.000000e-03 
+Cluster 3 : best deg 1. lam 1.000000e-09 
