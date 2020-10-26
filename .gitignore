@@ -1,2 +1,11 @@
 
-data/test.csv
+*.csv
+output/_oldOutput/corr0.png
+output/_oldOutput/corrcluster0.png
+output/_oldOutput/corrcluster1.png
+output/_oldOutput/histograms.pdf
+output/_oldOutput/histograms/feat16_logged.png
+output/_oldOutput/histograms/feat16_standardized.png
+output/_oldOutput/histograms/feat16_StdLog.png
+output/_oldOutput/histograms/feat16no_preprocess.png
+output/_oldOutput/Untitled-1.png

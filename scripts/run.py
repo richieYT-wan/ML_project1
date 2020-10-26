@@ -22,7 +22,7 @@ SAVEPATH = "../output/"
 #K-fold CV
 print("#===========::10-fold Crossvalidation::===========# \n")
 k_fold=10
-lambdas = np.logspace(-12,-3,12)
+lambdas = np.logspace(-12,-3,9)
 degrees = np.array(range(1,15))
 
 print("#===========::CV for Cluster 0::===========#")
@@ -70,8 +70,6 @@ degs = [9,5,11,11]
 """
 degs=[d_opt0,d_opt1,d_opt2,d_opt3]
 file1.close()
-
-
 
 try:
       DATA_TEST_PATH = '../data/test.csv' # TODO: download test data and supply path here 

@@ -6,7 +6,7 @@ from implementations import *
 Implements functions needed for training, hyper-parameters tuning, cross-validation.
 """
 
-def build_k_indices(y, k_fold=4, seed=667):
+def build_k_indices(y, k_fold=5, seed=667):
     """build k indices for k-fold."""
     num_row = y.shape[0]
     interval = int(num_row / k_fold)
@@ -16,7 +16,7 @@ def build_k_indices(y, k_fold=4, seed=667):
     return np.array(k_indices)
 
 
-def k_split(y, x, k_indices, k,seed=667):
+def k_split(y, x, k_indices, k):
     """
     Returns the split datasets for k-fold cross validation
     input : y (np.array) : target
@@ -52,7 +52,7 @@ def cross_validation_ridge(y, tx, k_indices, k, lambda_):
     return loss_tr, loss_te, w
 
 
-def crossval_ridge_gridsearch(y, tx_clust, k_fold, lambdas, degrees, loss=False):
+def crossval_ridge_gridsearch(y, tx_clust, k_fold, lambdas, degrees, loss=False, seed = 667):
     """
     Input : y (target), np.array
             tx (dataset), np.array
@@ -74,7 +74,7 @@ def crossval_ridge_gridsearch(y, tx_clust, k_fold, lambdas, degrees, loss=False)
              total_train_loss, total_test_loss (optional) : Arrays of losses for visualization
     """
     #Initializing values. 
-    k_indices = build_k_indices(y, k_fold)
+    k_indices = build_k_indices(y, k_fold, seed)
     #Get arrays of train and test loss for each degree (in axis=0), and each lambdas(in axis=1)
     total_train_loss = np.empty((len(degrees),len(lambdas)))
     total_test_loss = np.empty((len(degrees),len(lambdas)))
@@ -92,7 +92,7 @@ def crossval_ridge_gridsearch(y, tx_clust, k_fold, lambdas, degrees, loss=False)
             for k in range(k_fold):
                 train_loss, test_loss, _ = cross_validation_ridge(y,tx_poly,
                                                                    k_indices,
-                                                                   k,lambda_)
+                                                                     k,lambda_)
                 train_loss_tmp.append(train_loss)
                 test_loss_tmp.append(test_loss)
                 
