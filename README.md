@@ -14,10 +14,11 @@ To the run the script, make sure to have unzipped the data in `data`, then open 
 cd project1/scripts
 python run.py
 ```
-
+The script will run the 10-fold cross-validation process with Ridge Regression, get the optimal weights found and generate a prediction as well as store the hyperparameters.
 The predictions and the best hyperparameters are generated in the `output` folder
 
 All of the functions and scripts were written using :
+
     *CPython 3.7.5*
 
     *IPython 5.8.0*
@@ -25,7 +26,7 @@ All of the functions and scripts were written using :
     *numpy 1.19.1*
 
     *seaborn 0.11.0*
-    
+
     *jupyterlab 2.2.6*
 
 ## Folder Structure 
