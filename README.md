@@ -14,6 +14,7 @@ To the run the script, make sure to have unzipped the data in `data`, then open 
 cd project1/scripts
 python run.py
 ```
+In the case you already have the train.csv and test.csv files, simply move them into `data/`.
 The script will run the 10-fold cross-validation process with Ridge Regression, get the optimal weights found and generate a prediction as well as store the hyperparameters.
 The predictions and the best hyperparameters are generated in the `output` folder
 
@@ -32,7 +33,7 @@ All of the functions and scripts were written using :
 ## Folder Structure 
 
 *All .py files contain the necessary docstrings to use each and every function implemented, see below for a quick description of each method.
-The jupyter notebooks (.ipynb) used for exploratory data analysis were not included. However, the functions used for EDA were implemented and are located in proj1_helpers.
+The jupyter notebooks (.ipynb) used for exploratory data analysis are in `old_hyperparams_tuning` and some functions used for EDA were implemented and are located in proj1_helpers.
 For any information on how we did the EDA, please refer to `report_project1.pdf`*
 
 - `data/` : contains train and test data in as .zip

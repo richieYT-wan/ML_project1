@@ -28,46 +28,35 @@ degrees = np.array(range(1,15))
 print("#===========::CV for Cluster 0::===========#")
 file1 = open(SAVEPATH+"ridgecrossvalidation_params.txt","w")
 
-w_opt0, d_opt0, la0, train0, test0 = crossval_ridge_gridsearch(y0,tx0,k_fold,
+w_opt0, d_opt0, la0= crossval_ridge_gridsearch(y0,tx0,k_fold,
                                                              lambdas,degrees,
-                                                             loss=True)
+                                                             loss=False)
 file1.write("Cluster 0 : best deg {}. lam {:e} \n".format(d_opt0,la0))
 
 #----------------1
 print("\n#===========::CV for Cluster 1::===========#")
-w_opt1, d_opt1, la1, train1, test1 = crossval_ridge_gridsearch(y1,tx1,k_fold,
+w_opt1, d_opt1, la1 = crossval_ridge_gridsearch(y1,tx1,k_fold,
                                                              lambdas,degrees,
-                                                             loss=True)
+                                                             loss=False)
 file1.write("Cluster 1 : best deg {}. lam {:e} \n".format(d_opt1,la1))
 
 #----------------2
 print("\n#===========::CV for Cluster 2::===========#")
-w_opt2, d_opt2, la2, train2, test2 = crossval_ridge_gridsearch(y2,tx2,k_fold,
+w_opt2, d_opt2, la2= crossval_ridge_gridsearch(y2,tx2,k_fold,
                                                              lambdas,degrees,
-                                                             loss=True)
+                                                             loss=False)
 
 file1.write("Cluster 2 : best deg {}. lam {:e} \n".format(d_opt2,la2))
 
 #----------------3
 print("\n#===========::CV for Cluster 3::===========#")
-w_opt3, d_opt3, la3, train3, test3 = crossval_ridge_gridsearch(y3,tx3,k_fold,
+w_opt3, d_opt3, la3 = crossval_ridge_gridsearch(y3,tx3,k_fold,
                                                              lambdas,degrees,
-                                                             loss=True)
+                                                             loss=False)
 
 file1.write("Cluster 3 : best deg {}. lam {:e} \n".format(d_opt3,la3))
 
-"""
-la = 1e-9
-tx0 = build_poly(tx0,9)
-tx1 = build_poly(tx1,5)
-tx2 = build_poly(tx2,11)
-tx3 = build_poly(tx3,11)
-w_opt0,_ = ridge_regression(y0,tx0,la)
-w_opt1,_  = ridge_regression(y1,tx1,la)
-w_opt2,_  = ridge_regression(y2,tx2,la)
-w_opt3,_  = ridge_regression(y3,tx3,la)
-degs = [9,5,11,11]
-"""
+
 degs=[d_opt0,d_opt1,d_opt2,d_opt3]
 file1.close()
 
