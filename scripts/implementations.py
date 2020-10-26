@@ -7,7 +7,6 @@ from preprocessing import *
 
 """
 Implements the functions ("ML methods") required by the project 1 guidelines
-Unique (sole) author : Richie Yat-tsai Wan (258934)
 """
 #=========================================================================#
 #========                   Required functions                    ========#
@@ -33,6 +32,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     Using a minibatch size of 1, random and shuffled minibatches 
     are generated using the batch_iter function 
     """
+    
     #Initializing values 
     w = initial_w
     loss = 0
@@ -81,7 +81,7 @@ def ridge_regression(y, tx, lambda_):
     return w, loss
 
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=5e-6):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=5e-6, graphlosses = False):
     """Logistic regression using gradient descent or SGD
     Labels must be binary, i.e. y : {0;1}
     """
@@ -100,7 +100,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, tol=5e-6):
             print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
             break
     #Returning all three compononents to allow plotting
-    return w, losses[-1], losses
+    if graphlosses:
+        return w, losses[-1], losses
+    return w, losses[-1]
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, tol=5e-6):
@@ -119,6 +121,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, tol=5e-
         if i>(1/3)*max_iters and np.abs(losses[-1]-losses[-2]) < tol:
             print("Early convergence at epoch = {}. diff(loss)<={:e}".format(i,tol))
             break
-    
-    return w, losses[-1], losses
+    if graphlosses:
+        return w, losses[-1], losses
+    return w, losses[-1]
 

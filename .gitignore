@@ -1,21 +1,2 @@
 
 data/test.csv
-<<<<<<< Updated upstream
-data/test.csv
-scripts/.ipynb_checkpoints/project1-checkpoint.ipynb
-scripts/.ipynb_checkpoints/proj1_helpers-checkpoint.py
-=======
-scripts/.ipynb_checkpoints/costs-checkpoint.py
-scripts/.ipynb_checkpoints/implementations-checkpoint.py
-scripts/.ipynb_checkpoints/preprocessing-checkpoint.py
-scripts/.ipynb_checkpoints/proj1_helpers-checkpoint.py
-scripts/.ipynb_checkpoints/project1-checkpoint.ipynb
-scripts/.ipynb_checkpoints/project1_earlyExploration-checkpoint.ipynb
-scripts/.ipynb_checkpoints/project1_logistic-checkpoint.ipynb
-scripts/.ipynb_checkpoints/project1_preprocessing-checkpoint.ipynb
-scripts/.ipynb_checkpoints/train_tune-checkpoint.py
-scripts/__pycache__/proj1_helpers.cpython-37.pyc
-scripts/__pycache__/preprocessing.cpython-37.pyc
-scripts/__pycache__/implementations.cpython-37.pyc
-scripts/__pycache__/costs.cpython-37.pyc
->>>>>>> Stashed changes
