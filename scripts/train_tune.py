@@ -6,17 +6,17 @@ from implementations import *
 Implements functions needed for training, hyper-parameters tuning, cross-validation.
 """
 
-def build_k_indices(y, k_fold=4):#, seed=667):
+def build_k_indices(y, k_fold=4, seed=667):
     """build k indices for k-fold."""
     num_row = y.shape[0]
     interval = int(num_row / k_fold)
-    #np.random.seed(seed)
+    np.random.seed(seed)
     indices = np.random.permutation(num_row)
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return np.array(k_indices)
 
 
-def k_split(y, x, k_indices, k):
+def k_split(y, x, k_indices, k,seed=667):
     """
     Returns the split datasets for k-fold cross validation
     input : y (np.array) : target
