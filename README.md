@@ -19,9 +19,13 @@ The predictions and the best hyperparameters are generated in the `output` folde
 
 All of the functions and scripts were written using :
     *CPython 3.7.5*
+
     *IPython 5.8.0*
+
     *numpy 1.19.1*
+
     *seaborn 0.11.0*
+    
     *jupyterlab 2.2.6*
 
 ## Folder Structure 
